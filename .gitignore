@@ -1,0 +1,51 @@
+# ── ESP-IDF build artefacts ───────────────────────────────────────────────────
+build/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+
+# ── Generated weight header (produced by tools/train_tinyllm.py) ──────────────
+# Commit this file only after you have trained and exported real weights.
+# The placeholder (zero-init) version is intentionally tracked.
+# Uncomment the line below if you want to exclude it entirely:
+# components/tinyllm/include/weights.h
+
+# ── Python training artefacts ─────────────────────────────────────────────────
+tools/__pycache__/
+tools/*.pyc
+tools/*.pyo
+*.pt              # PyTorch checkpoints
+*.pth
+shakespeare.txt   # auto-downloaded corpus cache
+
+# ── Python virtual environments ───────────────────────────────────────────────
+.venv/
+venv/
+env/
+__pycache__/
+*.egg-info/
+dist/
+*.egg
+
+# ── Editor / IDE ──────────────────────────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Flash / serial port artefacts ─────────────────────────────────────────────
+*.bin
+*.elf
+*.map
+*.hex
+
+# ── CMake host build (if ever run outside idf.py) ─────────────────────────────
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
