@@ -29,39 +29,105 @@ static const char *TAG = "main";
 #define MAX_PROMPT_LEN  (TINYLLM_BLOCK_SIZE - 1)
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Read a newline-terminated line from stdin (blocking).
- * Returns number of characters read (excluding '\n' and '\0').
+ * Input reader state — tracks ANSI escape sequence parsing.
+ * ──────────────────────────────────────────────────────────────────────────── */
+typedef enum {
+    INPUT_NORMAL,       /* regular character */
+    INPUT_ESC,          /* received ESC (0x1B), waiting for '[' or 'O' */
+    INPUT_ESC_BRACKET,  /* received ESC '[', waiting for final byte */
+} input_state_t;
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Read a newline-terminated line from stdin with full editing support:
+ *   Backspace / DEL  — erase previous character
+ *   Ctrl+U  (0x15)  — erase entire line
+ *   Ctrl+C  (0x03)  — cancel current input, return empty string
+ *   Arrow keys / F-keys (ANSI ESC sequences) — silently discarded
+ *
+ * Returns number of characters in buf (excluding NUL).
  * ──────────────────────────────────────────────────────────────────────────── */
 static int read_line(char *buf, int max_len)
 {
     int idx = 0;
     int c;
+    input_state_t state = INPUT_NORMAL;
 
-    while (idx < max_len) {
+    while (1) {
         c = getchar();
 
         if (c == EOF || c < 0) {
             /* No data yet — yield to FreeRTOS scheduler */
-            vTaskDelay(pdMS_TO_TICKS(10));
+            vTaskDelay(pdMS_TO_TICKS(5));
             continue;
         }
 
-        if (c == '\n' || c == '\r') {
-            /* Echo newline so the terminal looks right */
-            putchar('\n');
-            fflush(stdout);
-            break;
+        /* ── ANSI escape sequence state machine ────────────────────────── */
+        if (state == INPUT_ESC_BRACKET) {
+            /* Final byte of a CSI sequence (e.g. 'A'=Up, 'B'=Down, 'C'=Right,
+             * 'D'=Left). Silently consume and return to normal. */
+            state = INPUT_NORMAL;
+            continue;
         }
 
-        /* Echo the character back */
-        putchar(c);
-        fflush(stdout);
+        if (state == INPUT_ESC) {
+            if (c == '[' || c == 'O') {
+                /* CSI or SS3 — one more byte to consume */
+                state = INPUT_ESC_BRACKET;
+            } else {
+                /* Lone ESC or other sequence — ignore */
+                state = INPUT_NORMAL;
+            }
+            continue;
+        }
 
-        buf[idx++] = (char)c;
+        /* ── Normal character processing ───────────────────────────────── */
+        switch (c) {
+
+        case '\x1b':  /* ESC — start of ANSI sequence */
+            state = INPUT_ESC;
+            break;
+
+        case '\b':    /* Backspace (Ctrl+H) */
+        case 0x7F:    /* DEL — sent by most terminals as Backspace */
+            if (idx > 0) {
+                idx--;
+                /* Erase the character on the terminal: back, space, back */
+                printf("\b \b");
+                fflush(stdout);
+            }
+            break;
+
+        case 0x15:    /* Ctrl+U — kill entire line */
+            while (idx > 0) {
+                printf("\b \b");
+                idx--;
+            }
+            fflush(stdout);
+            break;
+
+        case 0x03:    /* Ctrl+C — cancel input */
+            printf("^C\n");
+            fflush(stdout);
+            buf[0] = '\0';
+            return 0;
+
+        case '\n':
+        case '\r':    /* Enter — end of line */
+            putchar('\n');
+            fflush(stdout);
+            buf[idx] = '\0';
+            return idx;
+
+        default:
+            /* Accept only printable ASCII (matches tokenizer vocab 0x20-0x7E) */
+            if (c >= 0x20 && c <= 0x7E && idx < max_len) {
+                buf[idx++] = (char)c;
+                putchar(c);
+                fflush(stdout);
+            }
+            break;
+        }
     }
-
-    buf[idx] = '\0';
-    return idx;
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
