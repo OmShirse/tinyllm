@@ -1,6 +1,6 @@
-# TinyLLM — ESP32
+# TinyLLM  ESP32
 
-> A tiny decoder-only character-level language model that runs **fully on-device** on the ESP32 DevKit v1 — no PSRAM, no cloud.
+> A tiny decoder-only character-level language model that runs **fully on-device** on the ESP32 DevKit v1  no PSRAM, no cloud.
 
 Built with [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/latest/) · Inference in C · Training in PyTorch
 
