@@ -150,7 +150,7 @@ void app_main(void)
 
     char prompt[MAX_PROMPT_LEN + 1];
     float temperature = TINYLLM_DEFAULT_TEMPERATURE;
-    int   max_tokens  = TINYLLM_DEFAULT_MAX_TOKENS;
+    int   max_tokens  = 100;   /* enough for longest IoT response */
 
     while (1) {
         /* Print prompt */
@@ -201,6 +201,10 @@ void app_main(void)
         ESP_LOGI(TAG, "Prompt: \"%s\" | temp=%.2f | max_tokens=%d",
                  prompt, temperature, max_tokens);
 
-        tinyllm_generate(prompt, max_tokens, temperature);
+        /* Append '\n' so the model sees the same prompt/response separator
+         * it was trained on. Generation stops at the next '\n' (token 95). */
+        char prompt_nl[MAX_PROMPT_LEN + 2];
+        snprintf(prompt_nl, sizeof(prompt_nl), "%s\n", prompt);
+        tinyllm_generate(prompt_nl, max_tokens, temperature);
     }
-}
+    }

@@ -45,22 +45,27 @@ VOCAB_SIZE  = 95
 N_EMBD      = 64
 N_HEAD      = 4
 N_LAYER     = 2
-BLOCK_SIZE  = 32
-FF_DIM      = N_EMBD * 4          # 256
-HEAD_SIZE   = N_EMBD // N_HEAD    # 16
-CHAR_OFFSET = 0x20                # First printable ASCII
+VOCAB_SIZE    = 96                # printable ASCII 0x20-0x7E (95) + newline (1)
+N_EMBD        = 64
+N_HEAD        = 4
+N_LAYER       = 2
+BLOCK_SIZE    = 32
+FF_DIM        = N_EMBD * 4          # 256
+HEAD_SIZE     = N_EMBD // N_HEAD    # 16
+CHAR_OFFSET   = 0x20                # First printable ASCII
+TOKEN_NEWLINE = 95                # '\n' token ID
 
-OUTPUT_H    = Path(__file__).parent.parent / "components" / "tinyllm" / "include" / "weights.h"
-CHECKPOINT  = Path("tinyllm.pt")
-SHAKESPEARE_URL = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
+OUTPUT_H       = Path(__file__).parent.parent / "components" / "tinyllm" / "include" / "weights.h"
+CHECKPOINT     = Path("tinyllm.pt")
+DEFAULT_CORPUS = Path(__file__).parent / "corpus" / "iot_corpus.txt"
 
 # ── Training hyper-parameters ─────────────────────────────────────────────────
-BATCH_SIZE  = 64
-MAX_ITERS   = 5000
-EVAL_ITERS  = 200
-EVAL_INTERVAL = 500
-LR          = 3e-4
-DEVICE      = "cuda" if torch.cuda.is_available() else "cpu"
+BATCH_SIZE    = 32       # smaller for tiny corpus
+MAX_ITERS     = 50000    # overfit the small corpus
+EVAL_ITERS    = 100
+EVAL_INTERVAL = 5000
+LR            = 1e-3     # higher LR for fast convergence on small data
+DEVICE        = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -68,31 +73,41 @@ DEVICE      = "cuda" if torch.cuda.is_available() else "cpu"
 # ══════════════════════════════════════════════════════════════════════════════
 
 def load_corpus(path: str | None) -> str:
-    """Load text corpus, downloading Shakespeare if no path given."""
+    """Load text corpus. Defaults to the IoT corpus."""
     if path:
         print(f"Loading corpus from {path}")
         return Path(path).read_text(encoding="utf-8", errors="replace")
-
+    if DEFAULT_CORPUS.exists():
+        print(f"Using IoT corpus: {DEFAULT_CORPUS}")
+        return DEFAULT_CORPUS.read_text(encoding="utf-8")
+    # Fallback: download Shakespeare
     cache = Path("shakespeare.txt")
     if not cache.exists():
-        print(f"Downloading Shakespeare corpus from {SHAKESPEARE_URL}...")
+        print(f"Downloading Shakespeare corpus...")
         urllib.request.urlretrieve(SHAKESPEARE_URL, cache)
-        print(f"Saved to {cache} ({cache.stat().st_size // 1024} KB)")
     return cache.read_text(encoding="utf-8")
 
 
 def encode(text: str) -> list[int]:
-    """Encode text to token IDs. Non-printable chars are skipped."""
+    """Encode text to token IDs. Handles printable ASCII + newline."""
     tokens = []
     for c in text:
         code = ord(c)
         if 0x20 <= code <= 0x7E:
             tokens.append(code - CHAR_OFFSET)
+        elif c == '\n':
+            tokens.append(TOKEN_NEWLINE)
     return tokens
 
 
 def decode(tokens: list[int]) -> str:
-    return "".join(chr(t + CHAR_OFFSET) for t in tokens if 0 <= t < VOCAB_SIZE)
+    chars = []
+    for t in tokens:
+        if 0 <= t < 95:
+            chars.append(chr(t + CHAR_OFFSET))
+        elif t == TOKEN_NEWLINE:
+            chars.append('\n')
+    return "".join(chars)
 
 
 def get_batch(data: torch.Tensor, batch_size: int):
@@ -215,7 +230,7 @@ def estimate_loss(model: TinyLLM, data_splits: dict[str, torch.Tensor]) -> dict[
     return losses
 
 
-def train(corpus: str) -> TinyLLM:
+def train(corpus: str, model: TinyLLM | None = None) -> TinyLLM:
     tokens  = encode(corpus)
     data    = torch.tensor(tokens, dtype=torch.long)
     n_val   = max(1, int(0.1 * len(data)))
@@ -223,7 +238,8 @@ def train(corpus: str) -> TinyLLM:
     val_d   = data[-n_val:]
     splits  = {"train": train_d, "val": val_d}
 
-    model = TinyLLM().to(DEVICE)
+    if model is None:
+        model = TinyLLM().to(DEVICE)
     print(f"Model parameters: {model.param_count():,}")
     print(f"Corpus tokens: {len(tokens):,}  |  Training on: {DEVICE}")
 
@@ -422,17 +438,20 @@ def export_weights(model: TinyLLM, out_path: Path) -> None:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main():
+    global MAX_ITERS
     parser = argparse.ArgumentParser(description="Train TinyLLM and export weights.h")
     parser.add_argument("--corpus",      type=str,  default=None,
                         help="Path to a plain-text training corpus. "
                              "Defaults to downloading Shakespeare.")
     parser.add_argument("--checkpoint",  type=str,  default=None,
-                        help="Load this .pt checkpoint instead of training.")
+                        help="Path to a .pt checkpoint to resume from.")
     parser.add_argument("--export-only", action="store_true",
                         help="Skip training; only export --checkpoint to weights.h")
     parser.add_argument("--iters",       type=int,  default=MAX_ITERS,
                         help=f"Training iterations (default: {MAX_ITERS})")
     args = parser.parse_args()
+
+    MAX_ITERS = args.iters
 
     if args.export_only:
         if not args.checkpoint:
@@ -440,16 +459,15 @@ def main():
         model = TinyLLM().to(DEVICE)
         model.load_state_dict(torch.load(args.checkpoint, map_location=DEVICE))
         model.eval()
-    elif args.checkpoint and Path(args.checkpoint).exists():
-        print(f"Loading checkpoint from {args.checkpoint}")
-        model = TinyLLM().to(DEVICE)
-        model.load_state_dict(torch.load(args.checkpoint, map_location=DEVICE))
     else:
-        global MAX_ITERS
-        MAX_ITERS = args.iters
+        # Load checkpoint if provided, then always train
+        model = TinyLLM().to(DEVICE)
+        if args.checkpoint and Path(args.checkpoint).exists():
+            print(f"Resuming from checkpoint: {args.checkpoint}")
+            model.load_state_dict(torch.load(args.checkpoint, map_location=DEVICE))
         corpus = load_corpus(args.corpus)
         print(f"Corpus length: {len(corpus):,} characters")
-        model  = train(corpus)
+        model = train(corpus, model)
 
     export_weights(model, OUTPUT_H)
     print("\nDone! Rebuild the ESP-IDF project to flash the new weights.")

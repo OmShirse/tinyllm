@@ -1,0 +1,297 @@
+hello
+ESP32 TinyLLM ready. Type a command.
+hi
+Hello! I am TinyLLM on ESP32.
+hey
+Hey! ESP32 is running fine.
+hi there
+Hi! TinyLLM here, ready to help.
+hello there
+Hello! What can I do for you?
+hey there
+Hey there! ESP32 at your service.
+greetings
+Greetings! TinyLLM is online.
+good morning
+Good morning! ESP32 is up and running.
+good evening
+Good evening! Systems are nominal.
+good afternoon
+Good afternoon! All systems go.
+whats up
+All systems running. Ask me anything.
+sup
+ESP32 is active and listening.
+howdy
+Howdy! TinyLLM ready on ESP32.
+yo
+Yo! ESP32 TinyLLM online.
+who are you
+I am TinyLLM, running on ESP32.
+what are you
+I am a tiny language model on ESP32.
+introduce yourself
+I am TinyLLM, a small AI on ESP32.
+what is your name
+My name is TinyLLM. I run on ESP32.
+tell me about yourself
+I am TinyLLM, a tiny AI on an ESP32 chip.
+what can you do
+I can answer questions about this ESP32.
+help
+Commands: status, led, gpio, sensor, wifi, temp.
+what are the commands
+Try: status, led on, gpio, sensor, wifi, temp.
+list commands
+Commands: status, led, gpio, sensor, wifi, temp.
+status
+CPU: 240 MHz. Free heap: 420 KB. Up: 5 min.
+system status
+System OK. CPU 240 MHz. Heap 420 KB free.
+how are you
+All systems nominal. Running smoothly.
+are you ok
+Yes! ESP32 is running fine. Heap: 420 KB.
+system info
+ESP32 WROOM-32. Flash 4 MB. RAM 520 KB.
+chip info
+Xtensa LX6 dual-core at 240 MHz.
+memory
+Free heap: 420 KB. Flash: 4 MB total.
+free memory
+Heap free: 420 KB. Stack free: 6 KB.
+heap
+Free heap: 420 KB.
+uptime
+System uptime: 5 minutes 12 seconds.
+version
+TinyLLM v1.0 on ESP-IDF v5.2.
+led on
+GPIO2 set HIGH. LED is now ON.
+led off
+GPIO2 set LOW. LED is now OFF.
+turn on led
+GPIO2 HIGH. LED turned ON.
+turn off led
+GPIO2 LOW. LED turned OFF.
+led status
+LED is currently ON. GPIO2 is HIGH.
+led
+LED is ON. Use led on / led off.
+toggle led
+LED toggled. GPIO2 changed state.
+blink led
+Blinking LED on GPIO2 at 1 Hz.
+gpio
+GPIO2: HIGH. GPIO4: LOW. GPIO5: LOW.
+gpio status
+GPIO2: HIGH, GPIO4: LOW, GPIO5: LOW.
+gpio2
+GPIO2 is HIGH. LED is connected here.
+gpio4
+GPIO4 is LOW. Available for output.
+gpio5
+GPIO5 is LOW. Available for output.
+pin status
+GPIO2: HIGH. GPIO4: LOW. GPIO5: LOW.
+set gpio2 high
+GPIO2 set HIGH.
+set gpio2 low
+GPIO2 set LOW.
+temperature
+Temperature: 27.4 C. Sensor OK.
+temp
+Temperature: 27.4 C. Humidity: 65%.
+read temperature
+Sensor reading: 27.4 degrees Celsius.
+temperature reading
+Current temperature: 27.4 C.
+what is the temperature
+Temperature is 27.4 C right now.
+how hot is it
+Temperature: 27.4 C. Feeling warm!
+humidity
+Humidity: 65%. Temperature: 27.4 C.
+read humidity
+Humidity level: 65%. Sensor OK.
+dht sensor
+DHT22: Temp 27.4 C, Humidity 65%.
+sensor
+Sensor: Temp 27.4 C, Humidity 65%.
+sensor status
+All sensors OK. Temp: 27.4 C, Hum: 65%.
+read sensor
+Temp: 27.4 C. Humidity: 65%. All OK.
+sensors
+DHT22 OK. Temp 27.4 C. Humidity 65%.
+adc
+ADC1 CH0: 1842 raw. 1.48 V.
+read adc
+ADC reading: 1842. Voltage: 1.48 V.
+voltage
+ADC voltage: 1.48 V on channel 0.
+wifi
+WiFi connected. IP: 192.168.1.100.
+wifi status
+WiFi: Connected. SSID: MyNetwork. IP: 192.168.1.100.
+wifi connected
+Connected to MyNetwork. IP: 192.168.1.100.
+ip address
+IP address: 192.168.1.100.
+ip
+IP: 192.168.1.100. Subnet: 255.255.255.0.
+network
+Network: MyNetwork. IP: 192.168.1.100.
+signal
+WiFi signal: -62 dBm. Good.
+rssi
+RSSI: -62 dBm. Connection is good.
+ping
+Pinging 8.8.8.8... Response: 12 ms.
+ssid
+Connected to: MyNetwork.
+restart
+Restarting ESP32 now...
+reboot
+Rebooting in 3 seconds.
+reset
+Performing soft reset now.
+shutdown
+ESP32 shutting down. Goodbye!
+bye
+Goodbye! ESP32 going to sleep.
+goodbye
+Goodbye! TinyLLM signing off.
+sleep
+Entering deep sleep for 60 seconds.
+deep sleep
+Going to deep sleep. Wake on GPIO0.
+time
+System time: 15:30:00. Uptime: 5 min.
+clock
+Clock: 15:30:00. Date: 2026-09-13.
+date
+Date: 2026-09-13. Time: 15:30:00.
+battery
+Battery: 3.82 V. Level: 87%.
+voltage battery
+Battery voltage: 3.82 V. OK.
+power
+Power: USB 5V. Battery: 3.82 V.
+flash
+Flash: 4 MB total. 2 MB used.
+flash size
+Flash size: 4 MB. Used: 2 MB.
+cpu
+CPU: Xtensa LX6. Speed: 240 MHz.
+cpu speed
+CPU running at 240 MHz.
+cores
+Dual-core. Core 0: app. Core 1: idle.
+frequency
+CPU frequency: 240 MHz.
+uart
+UART0 active at 115200 baud.
+serial
+Serial: UART0, 115200 baud, 8N1.
+idf version
+ESP-IDF version: v5.2.0.
+sdk
+SDK: ESP-IDF v5.2.0.
+mac address
+MAC: AA:BB:CC:DD:EE:FF.
+mac
+WiFi MAC: AA:BB:CC:DD:EE:FF.
+bluetooth
+Bluetooth is disabled. BLE off.
+ble
+BLE is disabled to save memory.
+ok
+OK! Ready for next command.
+yes
+Confirmed! Command received.
+no
+Noted. No action taken.
+thanks
+You are welcome! Anything else?
+thank you
+Happy to help! Ask me anything.
+cool
+Thanks! TinyLLM on ESP32 is ready.
+awesome
+Glad it works! ESP32 TinyLLM ready.
+great
+Great! What would you like to know?
+nice
+Nice! ESP32 is running smoothly.
+good
+Good! All systems are nominal.
+bad
+I am sorry to hear that. Try restart.
+error
+Check sensor connections and power.
+problem
+Try reset. Type restart to reboot.
+not working
+Try: restart. Or check connections.
+fix
+Attempting auto-fix. Status: OK.
+test
+Test OK. All systems nominal.
+ping me
+Pong! Latency: 0 ms. I am here.
+echo
+Echo: I received your message.
+what time is it
+Current time: 15:30:00.
+what day is it
+Today is Saturday, 2026-09-13.
+hello
+ESP32 TinyLLM ready. Type a command.
+hi
+Hello! I am TinyLLM on ESP32.
+hey
+Hey! ESP32 is running fine.
+status
+CPU: 240 MHz. Free heap: 420 KB. Up: 5 min.
+temperature
+Temperature: 27.4 C. Sensor OK.
+temp
+Temperature: 27.4 C. Humidity: 65%.
+led on
+GPIO2 set HIGH. LED is now ON.
+led off
+GPIO2 set LOW. LED is now OFF.
+wifi
+WiFi connected. IP: 192.168.1.100.
+wifi status
+WiFi: Connected. SSID: MyNetwork. IP: 192.168.1.100.
+sensor
+Sensor: Temp 27.4 C, Humidity 65%.
+gpio
+GPIO2: HIGH. GPIO4: LOW. GPIO5: LOW.
+help
+Commands: status, led, gpio, sensor, wifi, temp.
+memory
+Free heap: 420 KB. Flash: 4 MB total.
+hello
+ESP32 TinyLLM ready. Type a command.
+hi
+Hello! I am TinyLLM on ESP32.
+temperature
+Temperature: 27.4 C. Sensor OK.
+led on
+GPIO2 set HIGH. LED is now ON.
+led off
+GPIO2 set LOW. LED is now OFF.
+wifi
+WiFi connected. IP: 192.168.1.100.
+status
+CPU: 240 MHz. Free heap: 420 KB. Up: 5 min.
+sensor
+Sensor: Temp 27.4 C, Humidity 65%.
+who are you
+I am TinyLLM, running on ESP32.
+help
+Commands: status, led, gpio, sensor, wifi, temp.
+

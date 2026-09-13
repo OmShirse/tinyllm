@@ -20,12 +20,13 @@
 #include <stdint.h>
 
 /* ── Hyperparameters ──────────────────────────────────────────────────────── */
-#define TINYLLM_VOCAB_SIZE   95
+#define TINYLLM_VOCAB_SIZE   96        /* printable ASCII 0x20-0x7E + newline */
 #define TINYLLM_N_EMBD       64
 #define TINYLLM_N_HEAD       4
 #define TINYLLM_HEAD_SIZE    (TINYLLM_N_EMBD / TINYLLM_N_HEAD)   /* 16 */
 #define TINYLLM_N_LAYER      2
 #define TINYLLM_BLOCK_SIZE   32
+#define TINYLLM_BLOCK_SIZE   96
 #define TINYLLM_FF_DIM       (TINYLLM_N_EMBD * 4)               /* 256 */
 
 /* ── Default generation parameters ───────────────────────────────────────── */

@@ -354,8 +354,11 @@ void tinyllm_generate(const char *prompt, int max_new_tokens, float temperature)
         memcpy(probs, s_logits, sizeof(s_logits));
 
         int next_token = sample_token(probs, TINYLLM_VOCAB_SIZE, temperature);
-        char c = tinyllm_decode(next_token);
 
+        /* Newline = end of response — stop without printing it */
+        if (next_token == TOKEN_NEWLINE) break;
+
+        char c = tinyllm_decode(next_token);
         putchar(c);
         fflush(stdout);
 
